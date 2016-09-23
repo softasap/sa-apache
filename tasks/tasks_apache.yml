@@ -18,7 +18,7 @@
 
     - name: Apache | install apache2 MPM Worker
       apt: name=apache2-mpm-worker state=latest
-      when: "apache_mode == 'worker' and not(ansible_distribution_release == "xenial") and apache_present|failed"
+      when: "apache_mode == 'worker' and not(ansible_distribution_release == 'xenial') and apache_present|failed"
       become: yes
       tags:
         - apache2
