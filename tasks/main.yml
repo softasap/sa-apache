@@ -1,3 +1,4 @@
 ---
 # tasks file for sa-apache
-  - include: tasks_apache.yml
+  - include_tasks: tasks_apache.yml
+    when: ansible_os_family == "Debian"
