@@ -45,15 +45,22 @@
       tags:
         - apache2
 
+    - name: Apache |install libapache2-mod-fastcgi
+      apt: name="libapache2-mod-fcgid" state="present"
+      when: apache_mode == 'worker' and not (ansible_distribution_release in ['bionic', 'trusty'])  and apache_present is failed
+      become: yes
+      tags:
+        - apache2
+
     # After a little digging, i realised that the module in question (proxy_fcgi) is actually part of the bionic apache2-bin package
-    # - name: Apache |enabled proxy_fcgi
-    #   apache2_module: name=proxy_fcgi state=present
-    #   when: apache_mode == 'worker' and not(ansible_distribution_release in ['trusty']) and apache_present is failed
-    #   become: yes
-    #   notify:
-    #     - restart apache2
-    #   tags:
-    #     - apache2
+    - name: Apache |enabled proxy_fcgi
+      apache2_module: name=proxy_fcgi state=present
+      when: apache_mode == 'worker' and not (ansible_distribution_release in ['bionic', 'trusty']) and apache_present is failed
+      become: yes
+      notify:
+        - restart apache2
+      tags:
+        - apache2
 
     - name: Apache |enabled module {{ item }}
       apache2_module: name=rewrite state=present
@@ -94,7 +101,7 @@
 
     - name: Apache |enabled mod_fastcgi
       apache2_module: name=fastcgi state=present
-      when: apache_mode == 'worker' and apache_present is failed
+      when: apache_mode == 'worker' and not (ansible_distribution_release in ['bionic', 'trusty'])  and apache_present is failed
       become: yes
       notify:
         - restart apache2
