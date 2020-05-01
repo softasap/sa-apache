@@ -8,5 +8,9 @@ ignore: |
 
 rules:
   line-length:
-    max: 120
+    max: 140
     level: warning
+  truthy: disable
+  indentation: disable
+  comments-indentation: disable
+  comments: disable
