@@ -1,7 +1,9 @@
 ---
-# handlers file for sa-apache
+  # handlers file for sa-apache
 
   - name: restart apache2
-    service: name=apache2 state=restarted
+    ansible.builtin.service:
+      name: apache2
+      state: restarted
     when: docker_test is not defined
     become: yes

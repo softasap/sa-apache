@@ -1,4 +1,5 @@
 ---
-# tasks file for sa-apache
-  - include_tasks: tasks_apache.yml
+  # tasks file for sa-apache
+  - name: Include Apache tasks for Debian family
+    ansible.builtin.include_tasks: tasks_apache.yml
     when: ansible_os_family == "Debian"
