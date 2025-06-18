@@ -3,17 +3,17 @@
     ansible.builtin.command: test -x /usr/sbin/apache2
     changed_when: false
     register: apache_present
-    ignore_errors: yes
+    ignore_errors: true
     tags:
       - apache2
 
   - name: Apache | install apache2
     ansible.builtin.apt:
       name: apache2
-      update_cache: yes
+      update_cache: true
       state: present
     when: apache_present is failed
-    become: yes
+    become: true
     tags:
       - apache2
 
@@ -28,7 +28,7 @@
       - apache_mode == 'worker'
       - ansible_distribution_release in ['trusty']
       - apache_present is failed
-    become: yes
+    become: true
     tags:
       - apache2
 
@@ -40,7 +40,7 @@
       - apache_mode == 'worker'
       - not (ansible_distribution_release in ['trusty'])
       - apache_present is failed
-    become: yes
+    become: true
     tags:
       - apache2
 
@@ -53,7 +53,7 @@
       - apache_mode == 'worker'
       - not (ansible_distribution_release in ['trusty'])
       - apache_present is failed
-    become: yes
+    become: true
     notify:
       - restart apache2
     tags:
@@ -65,7 +65,7 @@
       state: present
     loop: "{{ apache_modules | default([]) }}"
     when: apache_present is failed
-    become: yes
+    become: true
     notify:
       - restart apache2
     tags:
@@ -76,7 +76,7 @@
       name: actions
       state: present
     when: apache_mode == 'worker' and apache_present is failed
-    become: yes
+    become: true
     notify:
       - restart apache2
     tags:
@@ -87,7 +87,7 @@
       name: alias
       state: present
     when: apache_mode == 'worker' and apache_present is failed
-    become: yes
+    become: true
     notify:
       - restart apache2
     tags:
@@ -98,7 +98,7 @@
       name: ssl
       state: present
     when: apache_present is failed
-    become: yes
+    become: true
     notify:
       - restart apache2
     tags:
@@ -107,8 +107,10 @@
   - name: Apache | deactivate default site if apache2_disable_default is set
     ansible.builtin.command: a2dissite 000-default
     changed_when: false
-    when: apache2_disable_default and apache_present is failed
-    become: yes
+    when:
+      - apache2_disable_default
+      - apache_present is failed
+    become: true
     tags:
       - apache2
 
@@ -117,6 +119,6 @@
       name: apache2
       state: restarted
     when: docker_test is not defined
-    become: yes
+    become: true
     tags:
       - apache2

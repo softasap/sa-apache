@@ -6,4 +6,4 @@
       name: apache2
       state: restarted
     when: docker_test is not defined
-    become: yes
+    become: true
