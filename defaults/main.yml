@@ -1,6 +1,7 @@
 ---
 # defaults file for sa-apache
-apache_mode: "worker" # prefork | worker
+# prefork | worker
+apache_mode: "worker"
 apache2_disable_default: true
 
 apache_modules:

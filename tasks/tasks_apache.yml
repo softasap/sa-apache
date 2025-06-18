@@ -1,48 +1,69 @@
 ---
   - name: Apache | Check if is installed
-    command: test -x /usr/sbin/apache2
+    ansible.builtin.command: test -x /usr/sbin/apache2
+    changed_when: false
     register: apache_present
     ignore_errors: yes
     tags:
       - apache2
 
   - name: Apache | install apache2
-    apt: name=apache2 update_cache=yes state=present
+    ansible.builtin.apt:
+      name: apache2
+      update_cache: yes
+      state: present
     when: apache_present is failed
     become: yes
     tags:
       - apache2
 
-# There is no apache2-mpm-worker package because the mpm_worker module is included by default when you install Apache on 16.04.
-# It is contained in the apache2-bin package that is a dependency of apache2 dpkg -L apache2-bin | grep mpm
+      # There is no apache2-mpm-worker package because the mpm_worker module is included by default when you install Apache on 16.04.
+    # It is contained in the apache2-bin package that is a dependency of apache2 dpkg -L apache2-bin | grep mpm
 
   - name: Apache | install apache2 MPM Worker
-    apt: name=apache2-mpm-worker state=present
-    when: apache_mode == 'worker' and (ansible_distribution_release in ['trusty']) and apache_present is failed
+    ansible.builtin.apt:
+      name: apache2-mpm-worker
+      state: present
+    when:
+      - apache_mode == 'worker'
+      - ansible_distribution_release in ['trusty']
+      - apache_present is failed
     become: yes
     tags:
       - apache2
 
-  - name: Apache |install libapache2-mod-fcgid
-    apt: name=libapache2-mod-fcgid state=present
-    when: apache_mode == 'worker' and not (ansible_distribution_release in ['trusty'])  and apache_present is failed
+  - name: Apache | install libapache2-mod-fcgid
+    ansible.builtin.apt:
+      name: libapache2-mod-fcgid
+      state: present
+    when:
+      - apache_mode == 'worker'
+      - not (ansible_distribution_release in ['trusty'])
+      - apache_present is failed
     become: yes
     tags:
       - apache2
 
   # After a little digging, i realised that the module in question (proxy_fcgi) is actually part of the bionic apache2-bin package
-  - name: Apache |enabled proxy_fcgi
-    apache2_module: name=proxy_fcgi state=present
-    when: apache_mode == 'worker' and not (ansible_distribution_release in ['trusty']) and apache_present is failed
+  - name: Apache | enable proxy_fcgi
+    community.general.apache2_module:
+      name: proxy_fcgi
+      state: present
+    when:
+      - apache_mode == 'worker'
+      - not (ansible_distribution_release in ['trusty'])
+      - apache_present is failed
     become: yes
     notify:
       - restart apache2
     tags:
       - apache2
 
-  - name: Apache |enabled module {{ item }}
-    apache2_module: name=rewrite state=present
-    with_items: "{{ apache_modules|default([]) }}"
+  - name: Apache | enable module {{ item }}
+    community.general.apache2_module:
+      name: "{{ item }}"
+      state: present
+    loop: "{{ apache_modules | default([]) }}"
     when: apache_present is failed
     become: yes
     notify:
@@ -50,8 +71,10 @@
     tags:
       - apache2
 
-  - name: Apache |enabled mod_actions
-    apache2_module: name=actions state=present
+  - name: Apache | enable mod_actions
+    community.general.apache2_module:
+      name: actions
+      state: present
     when: apache_mode == 'worker' and apache_present is failed
     become: yes
     notify:
@@ -59,8 +82,10 @@
     tags:
       - apache2
 
-  - name: Apache |enabled mod_alias
-    apache2_module: name=alias state=present
+  - name: Apache | enable mod_alias
+    community.general.apache2_module:
+      name: alias
+      state: present
     when: apache_mode == 'worker' and apache_present is failed
     become: yes
     notify:
@@ -68,8 +93,10 @@
     tags:
       - apache2
 
-  - name: Apache |enabled mod_ssl
-    apache2_module: name=ssl state=present
+  - name: Apache | enable mod_ssl
+    community.general.apache2_module:
+      name: ssl
+      state: present
     when: apache_present is failed
     become: yes
     notify:
@@ -77,15 +104,18 @@
     tags:
       - apache2
 
-  - name: Apache | deactivate default site if {{ apache2_disable_default }} is set
-    command: a2dissite 000-default
+  - name: Apache | deactivate default site if apache2_disable_default is set
+    ansible.builtin.command: a2dissite 000-default
+    changed_when: false
     when: apache2_disable_default and apache_present is failed
     become: yes
     tags:
       - apache2
 
-  - name: Apache |restart apache2
-    service: name=apache2 state=restarted
+  - name: Apache | restart apache2
+    ansible.builtin.service:
+      name: apache2
+      state: restarted
     when: docker_test is not defined
     become: yes
     tags:
