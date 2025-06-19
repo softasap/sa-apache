@@ -1,6 +1,8 @@
 ---
 galaxy_info:
-  role_name: sa-apache
+  role_name: sa_apache
+  alternate_role_name:
+    - sa-apache
   namespace: softasap
   author: vyacheslav voronenko
   description: Installs apache and enables set of modules.
