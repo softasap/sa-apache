@@ -1,11 +1,11 @@
 ---
-  # handlers file for sa-apache
+# handlers file for sa-apache
 
-  - name: restart apache2
-    ansible.builtin.service:
-      name: apache2
-      state: restarted
-    when: docker_test is not defined
-    become: true
-    tags:
-      - skip_ansible_lint
+- name: restart apache2
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+  when: docker_test is not defined
+  become: true
+  tags:
+    - skip_ansible_lint
