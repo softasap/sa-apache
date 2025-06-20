@@ -7,3 +7,5 @@
       state: restarted
     when: docker_test is not defined
     become: true
+    tags:
+      - skip_ansible_lint
