@@ -1,7 +1,7 @@
 ---
 - name: Configure web server
   hosts: www
-  gather_facts: False
+  gather_facts: false
 
   vars:
     root_dir: ..
@@ -13,13 +13,13 @@
 
     - name: ANSIBLE PYTHON | install python fallback if needed
       ansible.builtin.raw: test -e /usr/bin/python || test -e /usr/bin/python3 || (apt -qqy update && apt install -qy python-minimal)
-      become: yes
-      changed_when: False
+      become: true
+      changed_when: false
 
     - name: UNPRIVILEGED USERS | Get acl dependency (ansible unprivileged user operations magic)
       ansible.builtin.apt:
         pkg: "acl"
-      become: yes
+      become: true
 
     - name: Gather facts
       ansible.builtin.setup:

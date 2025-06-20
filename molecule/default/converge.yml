@@ -13,10 +13,10 @@
 
     - name: Include default vars
       ansible.builtin.include_vars:
-        file: "playbook_vars.yml"
+        file: "molecule_vars.yml"
 
   roles:
     - role: sa-apache
 
-  #- name: Apply box play
-  #  ansible.builtin.import_playbook: ../../playbook.yml
+  # - name: Apply box play
+  #   ansible.builtin.import_playbook: ../../playbook.yml
